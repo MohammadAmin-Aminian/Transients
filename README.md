@@ -42,6 +42,9 @@ python -m pytest -q
 ```
 
 Tests verify parent-trace replacement, timing validation and lossless chunk boundaries.
+A real TiSKitPy integration test constructs known periodic Gaussian pulses on noise
+and requires at least 80% reduction in pulse RMS error while preserving trace identity
+and timing. This benchmark covers one synthetic timing/amplitude configuration.
 Scientific effectiveness on original survey waveforms remains unverified; inspect
 before/after waveforms and spectra. Transient removal can also remove real signals
 with similar timing, so calibration and earthquake exclusion matter.
@@ -49,3 +52,5 @@ with similar timing, so calibration and earthquake exclusion matter.
 Reference: [TiSKitPy periodic transients](https://tiskitpy.readthedocs.io/latest/periodic_transients.html).
 Author: Mohammad Amin Aminian. No license was present in the original repository;
 no additional reuse rights are asserted here.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development and bug reports.

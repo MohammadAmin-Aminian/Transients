@@ -73,3 +73,34 @@ def test_process_appends_each_cleaned_chunk_once(monkeypatch):
     assert len(output) == 1
     assert output[0].stats.npts == 16000
     assert not output[0].data.any()
+
+
+def test_real_tiskitpy_suppresses_known_periodic_pulses():
+    from obspy import UTCDateTime
+    from Transients_Removal_24_Aug_23 import process
+
+    samples = 16000
+    time = np.arange(samples)
+    background = np.random.default_rng(2).normal(0, 0.1, samples)
+    pulses = np.zeros(samples)
+    for onset in range(1000, samples, 3620):
+        pulses += 10 * np.exp(-0.5 * ((time - onset) / 15) ** 2)
+    original = background + pulses
+    data = Stream(
+        [
+            Trace(
+                original.copy(),
+                header={"station": "RR38", "channel": "BHZ", "sampling_rate": 1},
+            )
+        ]
+    )
+    cleaned = process(data, "RR38", UTCDateTime(1000), window_seconds=samples)
+    assert len(cleaned) == 1
+    assert cleaned[0].id == data[0].id
+    for field in ("starttime", "endtime", "sampling_rate", "npts"):
+        assert cleaned[0].stats[field] == data[0].stats[field]
+    assert np.isfinite(cleaned[0].data).all()
+    before = np.sqrt(np.mean(pulses**2))
+    after = np.sqrt(np.mean((cleaned[0].data - background) ** 2))
+    assert after < before * 0.2
+    np.testing.assert_array_equal(data[0].data, original)
