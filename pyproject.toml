@@ -9,6 +9,8 @@ description = "Periodic instrument-transient removal for ocean-bottom seismic da
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{name = "Mohammad Amin Aminian"}]
+license = "GPL-3.0-only"
+license-files = ["LICENSE"]
 dependencies = [
   "numpy>=1.26,<3",
   "obspy>=1.4,<2",
