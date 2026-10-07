@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<10"]
+dev = ["pytest>=8,<10", "build>=1"]
 
 [project.scripts]
 obs-transient-clean = "Transients_Removal_24_Aug_23:main"
