@@ -5,7 +5,7 @@ type: software
 authors:
   - family-names: Aminian
     given-names: Mohammad Amin
-repository-code: "https://github.com/MohammadAmin-Aminian/Transients"
+repository-code: "https://github.com/MohammadAmin-Aminian/obs-transient-cleaner"
 license: GPL-3.0-only
 references:
   - type: article
