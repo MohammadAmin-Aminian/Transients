@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "obs-transient-cleaner"
+version = "0.1.0"
+description = "Periodic instrument-transient removal for ocean-bottom seismic data"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Mohammad Amin Aminian"}]
+dependencies = [
+  "numpy>=1.26,<3",
+  "obspy>=1.4,<2",
+  "tiskitpy==2.3.1"
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10"]
+
+[project.scripts]
+obs-transient-clean = "Transients_Removal_24_Aug_23:main"
+
+[project.urls]
+Repository = "https://github.com/MohammadAmin-Aminian/Transients"
+Publication = "https://doi.org/10.1093/gji/ggaf253"
+
+[tool.setuptools]
+py-modules = ["Transients_Removal_24_Aug_23"]
