@@ -1,5 +1,7 @@
 # OBS Transient Cleaner
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+
 **Periodic instrument-transient detection and removal for ocean-bottom seismic data.**
 
 [![Regression tests](https://github.com/MohammadAmin-Aminian/Transients/actions/workflows/tests.yml/badge.svg)](https://github.com/MohammadAmin-Aminian/Transients/actions/workflows/tests.yml)
@@ -179,3 +181,8 @@ This repository is part of a broader seismic/geophysical software portfolio:
 - [RHUM-RUM Geospatial Mapper](https://github.com/MohammadAmin-Aminian/Map) — bathymetry, OBS-network and tectonic-context mapping.
 - [VRE Seismic Enhancement](https://github.com/MohammadAmin-Aminian/vre-seismic-enhancement) — Virtual Resolution Enhancement for seismic sections.
 - [Gabor Seismic Filter](https://github.com/MohammadAmin-Aminian/gabor-seismic-filter) — orientation-selective 2-D seismic filtering in MATLAB.
+
+
+## License
+
+This software is released under the **GNU General Public License v3.0 or later-compatible GPL-3.0-only identifier used by the package metadata**. See [LICENSE](LICENSE) for the full terms.
