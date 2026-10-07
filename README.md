@@ -185,4 +185,4 @@ This repository is part of a broader seismic/geophysical software portfolio:
 
 ## License
 
-This software is released under the **GNU General Public License v3.0 or later-compatible GPL-3.0-only identifier used by the package metadata**. See [LICENSE](LICENSE) for the full terms.
+This software is released under the **GNU General Public License v3.0 only (GPL-3.0-only)**. See [LICENSE](LICENSE) for the full terms.
