@@ -72,7 +72,7 @@ Python 3.10 or newer:
 ```bash
 git clone https://github.com/MohammadAmin-Aminian/Transients.git
 cd Transients
-python -m pip install -r requirements.txt
+python -m pip install -e '.[dev]'
 ```
 
 Dependencies include NumPy, ObsPy and TiSKitPy 2.3.1.
@@ -80,7 +80,7 @@ Dependencies include NumPy, ObsPy and TiSKitPy 2.3.1.
 ## Basic use
 
 ```bash
-python Transients_Removal_24_Aug_23.py input.mseed cleaned.mseed \
+obs-transient-clean input.mseed cleaned.mseed \
     --station RR38 \
     --transient-start 2012-10-12T00:00:00
 ```
@@ -88,7 +88,7 @@ python Transients_Removal_24_Aug_23.py input.mseed cleaned.mseed \
 For interactive timing refinement:
 
 ```bash
-python Transients_Removal_24_Aug_23.py input.mseed cleaned.mseed \
+obs-transient-clean input.mseed cleaned.mseed \
     --station RR38 \
     --transient-start 2012-10-12T00:00:00 \
     --interactive
@@ -101,7 +101,7 @@ Optional processing controls:
 - `--earthquake-spans` — enable earthquake exclusion during calibration;
 - `--interactive` — inspect/refine transient timing.
 
-Run `--help` for the full command-line interface.
+The historical script entry point remains available as `python Transients_Removal_24_Aug_23.py ...` for backward compatibility. Run `obs-transient-clean --help` for the full command-line interface.
 
 ## Input requirements
 
