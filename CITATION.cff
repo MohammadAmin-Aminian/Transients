@@ -6,6 +6,7 @@ authors:
   - family-names: Aminian
     given-names: Mohammad Amin
 repository-code: "https://github.com/MohammadAmin-Aminian/Transients"
+license: GPL-3.0-only
 references:
   - type: article
     title: "Shallow crustal structures of the Indian ocean derived from compliance function analysis"
