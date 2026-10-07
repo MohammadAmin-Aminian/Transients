@@ -1,10 +1,71 @@
-# RHUM-RUM periodic transient removal — version 2
+# OBS Transient Cleaner
 
-Remove repeating instrument transients from a local MiniSEED stream using TiSKitPy.
-The station periods and clipping levels are historical starting guesses, not
-universal calibrations. Validate them against your instrument and waveform units.
+**Periodic instrument-transient detection and removal for ocean-bottom seismic data.**
 
-## Run
+[![Regression tests](https://github.com/MohammadAmin-Aminian/Transients/actions/workflows/tests.yml/badge.svg)](https://github.com/MohammadAmin-Aminian/Transients/actions/workflows/tests.yml)
+[![TiSKitPy](https://img.shields.io/badge/TiSKitPy-2.3.1-blue)](https://tiskitpy.readthedocs.io/)
+
+This repository provides a focused workflow for removing repeating instrumental transients from ocean-bottom seismometer records. It was developed around the RHUM-RUM experiment, where approximately hourly mass-positioning events can contaminate long-period seismic processing.
+
+The code is intentionally narrow in scope: it handles **periodic transient suppression**, timing integrity, chunked processing and optional tilt-related rotation before cleaning. It is not a general denoising package.
+
+## Scientific motivation
+
+Long-period OBS processing is especially sensitive to non-seismic signals. In broadband seafloor records, repeating instrument events can leak into spectral estimates, coherence calculations and later compliance processing if they are not identified and removed consistently.
+
+The RHUM-RUM compliance workflow used careful preprocessing before estimating the relationship between vertical displacement and pressure. This repository isolates one of those preprocessing tasks so it can be tested and reused independently.
+
+Associated scientific context: [Aminian et al. (2025), Geophysical Journal International](https://doi.org/10.1093/gji/ggaf253).
+
+## What the tool does
+
+```text
+MiniSEED input
+    |
+    v
+validate timing / channels / gaps
+    |
+    v
+split into processing windows
+    |
+    +--> optional tilt-related rotation
+    |
+    v
+construct periodic transient model
+    |
+    v
+estimate transient waveform
+    |
+    v
+remove repeating transient
+    |
+    v
+merge chunks without losing boundaries
+    |
+    v
+cleaned MiniSEED output
+```
+
+Key features:
+
+- station-specific historical transient periods and clipping ranges;
+- explicit transient onset supplied by the user;
+- deterministic chunking with no duplicated or dropped boundary samples;
+- preservation of trace identity and timing;
+- optional `CleanRotator` step through TiSKitPy;
+- optional earthquake-span exclusion during calibration;
+- synthetic integration test using the real TiSKitPy transient remover;
+- refusal to overwrite existing outputs.
+
+## Supported RHUM-RUM stations
+
+Current historical presets are included for:
+
+`RR28`, `RR29`, `RR31`, `RR34`, `RR36`, `RR38`, `RR40`, `RR50`, `RR52`.
+
+These values are **starting parameters from the original workflow**, not universal instrument calibrations. They should be inspected and recalibrated for other deployments or instruments.
+
+## Installation
 
 Python 3.10 or newer:
 
@@ -12,45 +73,98 @@ Python 3.10 or newer:
 git clone https://github.com/MohammadAmin-Aminian/Transients.git
 cd Transients
 python -m pip install -r requirements.txt
-python Transients_Removal_24_Aug_23.py input.mseed cleaned.mseed \
-  --station RR38 --transient-start 2012-10-12T00:00:00 --interactive
 ```
 
-Replace the sample timestamp with the **observed transient onset**. Interactive
-calibration opens plots requiring manual inspection and closure. Supported station
-IDs are RR28, RR29, RR31, RR34, RR36, RR38, RR40, RR50 and RR52. Use `--help` for options.
-Default windows are five days. Every chunk, including the final one, must contain
-at least two transient periods; adjust `--window-days` if the tail is too short.
+Dependencies include NumPy, ObsPy and TiSKitPy 2.3.1.
 
-Input must contain one vertical channel and aligned, finite, gap-free traces with
-identical start time, sample rate and sample count. Repair gaps and alignment
-explicitly before running; the program does not silently interpolate missing data.
-`--rotate` enables tilt correction and requires the horizontal components expected
-by TiSKitPy (normally BH1/BH2). `--earthquake-spans` enables earthquake exclusion and
-may contact a remote event service. Without these flags the workflow uses local data.
-Existing output paths are refused. Output is float64 MiniSEED, retaining channel IDs.
+## Basic use
 
-## Fixes and validation
+```bash
+python Transients_Removal_24_Aug_23.py input.mseed cleaned.mseed \
+    --station RR38 \
+    --transient-start 2012-10-12T00:00:00
+```
 
-Version 2 uses the supported TiSKitPy 2.3.1 `PeriodicTransient` API, eliminates personal
-absolute paths and unused station downloads, replaces the vertical trace in the
-actual parent stream, appends each cleaned chunk once and preserves boundary samples.
-No processing starts during import. Raw input files are never overwritten.
+For interactive timing refinement:
+
+```bash
+python Transients_Removal_24_Aug_23.py input.mseed cleaned.mseed \
+    --station RR38 \
+    --transient-start 2012-10-12T00:00:00 \
+    --interactive
+```
+
+Optional processing controls:
+
+- `--window-days` — chunk duration, default 5 days;
+- `--rotate` — apply TiSKitPy `CleanRotator` before transient removal;
+- `--earthquake-spans` — enable earthquake exclusion during calibration;
+- `--interactive` — inspect/refine transient timing.
+
+Run `--help` for the full command-line interface.
+
+## Input requirements
+
+The input stream must:
+
+- contain exactly one vertical channel;
+- contain traces from the requested station only;
+- have aligned start times;
+- have identical sampling rates and sample counts;
+- be finite and gap-free.
+
+The program deliberately rejects ambiguous or damaged inputs instead of silently interpolating them.
+
+Each processing chunk must contain at least two transient periods. If the final chunk is too short, increase or decrease `--window-days`.
+
+## Validation
+
+Run:
 
 ```bash
 python -m pytest -q
 ```
 
-Tests verify parent-trace replacement, timing validation and lossless chunk boundaries.
-A real TiSKitPy integration test constructs known periodic Gaussian pulses on noise
-and requires at least 80% reduction in pulse RMS error while preserving trace identity
-and timing. This benchmark covers one synthetic timing/amplitude configuration.
-Scientific effectiveness on original survey waveforms remains unverified; inspect
-before/after waveforms and spectra. Transient removal can also remove real signals
-with similar timing, so calibration and earthquake exclusion matter.
+The current tests verify:
 
-Reference: [TiSKitPy periodic transients](https://tiskitpy.readthedocs.io/latest/periodic_transients.html).
-Author: Mohammad Amin Aminian. No license was present in the original repository;
-no additional reuse rights are asserted here.
+- exact chunk-boundary preservation;
+- parent-stream trace replacement;
+- rejection of misaligned traces;
+- one-pass processing of each chunk;
+- timing and identity preservation;
+- substantial suppression of known synthetic periodic pulses using real TiSKitPy processing.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development and bug reports.
+The synthetic benchmark requires the residual pulse RMS error to fall below 20% of the original pulse RMS for the tested configuration.
+
+## Interpretation and limitations
+
+Transient removal can also suppress real signals if they overlap the learned transient timing or waveform. For that reason:
+
+- inspect before/after waveforms;
+- compare power spectra before and after cleaning;
+- exclude earthquakes when appropriate;
+- do not transfer station-specific timing parameters blindly;
+- validate the cleaned trace before downstream compliance or noise analysis.
+
+This project does **not** claim to distinguish all instrumental artefacts from geophysical signals. It targets a specific class of repeating OBS transients.
+
+## Relationship to ComPy
+
+This repository is a standalone preprocessing tool.
+
+- **OBS Transient Cleaner**: repeating instrumental transient removal.
+- **ComPy**: broader compliance processing, calibration and inversion.
+
+The functionality was used in the wider scientific workflow, but it is useful independently for OBS quality control and long-period preprocessing.
+
+## Reference
+
+Aminian, M. A., Crawford, W., Stutzmann, É., Montagner, J.-P., Cannat, M., & Hadziioannou, C. (2025). *Shallow crustal structures of the Indian ocean derived from compliance function analysis*. Geophysical Journal International, 242(3), ggaf253. https://doi.org/10.1093/gji/ggaf253
+
+TiSKitPy periodic transient documentation: https://tiskitpy.readthedocs.io/latest/periodic_transients.html
+
+## Development
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [CHANGELOG.md](CHANGELOG.md).
+
+**Author:** Mohammad Amin Aminian
