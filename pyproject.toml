@@ -19,11 +19,11 @@ dependencies = [
 dev = ["pytest>=8,<10", "build>=1"]
 
 [project.scripts]
-obs-transient-clean = "Transients_Removal_24_Aug_23:main"
+obs-transient-clean = "obs_transient_cleaner:main"
 
 [project.urls]
 Repository = "https://github.com/MohammadAmin-Aminian/Transients"
 Publication = "https://doi.org/10.1093/gji/ggaf253"
 
 [tool.setuptools]
-py-modules = ["Transients_Removal_24_Aug_23"]
+py-modules = ["Transients_Removal_24_Aug_23", "obs_transient_cleaner"]
